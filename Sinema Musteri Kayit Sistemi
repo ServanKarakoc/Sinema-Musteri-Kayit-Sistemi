@@ -1,0 +1,195 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Temel sınıf
+class BaseEntity {
+    // Temel sınıf, ortak özellikler ve metodlar için kullanılır
+    public void bilgiGoster() {
+        System.out.println("Genel Bilgiler...");
+    }
+}
+
+// Interface
+interface IKayit {
+    void kayitOl(Musteri musteri);
+    void filmEkle(Film film);
+}
+
+// Film sınıfı
+class Film extends BaseEntity {
+    private String ad;
+    private int sure;
+    private String tur;
+
+    public Film(String ad, int sure, String tur) {
+        this.ad = ad;
+        this.sure = sure;
+        this.tur = tur;
+    }
+
+    // Getter ve Setter metodları
+    public String getAd() {
+        return ad;
+    }
+
+    public void setAd(String ad) {
+        this.ad = ad;
+    }
+
+    public int getSure() {
+        return sure;
+    }
+
+    public void setSure(int sure) {
+        this.sure = sure;
+    }
+
+    public String getTur() {
+        return tur;
+    }
+
+    public void setTur(String tur) {
+        this.tur = tur;
+    }
+
+    // BaseEntity'deki bilgiGoster() metodunu override ediyoruz
+    @Override
+    public void bilgiGoster() {
+        System.out.println("Film Adı: " + this.ad);
+        System.out.println("Film Süresi: " + this.sure + " dakika");
+        System.out.println("Film Türü: " + this.tur);
+    }
+}
+
+// Musteri sınıfı
+class Musteri extends BaseEntity {
+    private String ad;
+    private String soyad;
+
+    public Musteri(String ad, String soyad) {
+        this.ad = ad;
+        this.soyad = soyad;
+    }
+
+    // Getter ve Setter metodları
+    public String getAd() {
+        return ad;
+    }
+
+    public void setAd(String ad) {
+        this.ad = ad;
+    }
+
+    public String getSoyad() {
+        return soyad;
+    }
+
+    public void setSoyad(String soyad) {
+        this.soyad = soyad;
+    }
+
+    // BaseEntity'deki bilgiGoster() metodunu override ediyoruz
+    @Override
+    public void bilgiGoster() {
+        System.out.println("Müşteri Adı: " + this.ad + " " + this.soyad);
+    }
+}
+
+// Salon sınıfı
+class Salon implements IKayit {
+    private String salonAd;
+    private Film film;
+    private List<Musteri> kayitliMusteriler = new ArrayList<>();
+
+    public Salon(String salonAd) {
+        this.salonAd = salonAd;
+    }
+
+    // Film ekleme
+    @Override
+    public void filmEkle(Film film) {
+        this.film = film;
+    }
+
+    // Müşteri kaydetme
+    @Override
+    public void kayitOl(Musteri musteri) {
+        kayitliMusteriler.add(musteri);
+    }
+
+    // Salon bilgileri ve kayıtlı müşteri listeleme
+    public void salonBilgileri() {
+        System.out.println("Salon Adı: " + salonAd);
+        if (film != null) {
+            film.bilgiGoster();  // Film null değilse bilgileri göster
+        } else {
+            System.out.println("Bu salonda henüz bir film gösterilmiyor.");  // Film null ise bilgilendirme mesajı
+        }
+        System.out.println("Kayıtlı Müşteriler:");
+        if (kayitliMusteriler.isEmpty()) {
+            System.out.println("Henüz müşteri kaydedilmemiş.");
+        } else {
+            for (Musteri musteri : kayitliMusteriler) {
+                musteri.bilgiGoster();  // Müşterilerin bilgilerini göster
+            }
+        }
+    }
+
+    // Getter metodları
+    public String getSalonAd() {
+        return salonAd;
+    }
+
+    public Film getFilm() {
+        return film;
+    }
+
+    public List<Musteri> getKayitliMusteriler() {
+        return kayitliMusteriler;
+    }
+}
+
+// Ana uygulama sınıfı
+public class SinemaSistemi {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Salon ve film oluşturuluyor
+        Salon salon1 = new Salon("Salon 1");
+        Film film1 = new Film("The Matrix", 136, "Aksiyon");
+        
+        // Salon'a film ekleniyor
+        salon1.filmEkle(film1);
+
+        // Kullanıcıdan müşteri bilgisi alalım
+        System.out.print("Müşteri Adı: ");
+        String musteriAd = scanner.nextLine();
+        System.out.print("Müşteri Soyadı: ");
+        String musteriSoyad = scanner.nextLine();
+        Musteri musteri1 = new Musteri(musteriAd, musteriSoyad);
+        salon1.kayitOl(musteri1);
+
+        // Salon bilgilerini göster
+        salon1.salonBilgileri();
+
+        // Yeni müşteri ekleyelim
+        System.out.print("\nYeni Müşteri Adı: ");
+        musteriAd = scanner.nextLine();
+        System.out.print("Yeni Müşteri Soyadı: ");
+        musteriSoyad = scanner.nextLine();
+        Musteri musteri2 = new Musteri(musteriAd, musteriSoyad);
+        salon1.kayitOl(musteri2);
+
+        // Salon bilgilerini tekrar göster
+        System.out.println("\n--- Güncellenmiş Salon Bilgileri ---");
+        salon1.salonBilgileri();
+
+        // Film eklenmeden bir salon gösterme
+        Salon salon2 = new Salon("Salon 2");
+        System.out.println("\n--- Salon 2 Bilgileri (Henüz Film Eklenmemiş) ---");
+        salon2.salonBilgileri();
+
+        scanner.close();
+    }
+}
